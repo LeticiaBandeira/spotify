@@ -11,12 +11,8 @@ import plotly.graph_objects as go
 import pymongo
 
 #lendo arquivo com os dados de historico de musicas
-#spotify_com_id = pd.read_csv('C:/Users/letic/projetos/spotify/Dash/dados/StreamingHistory_music.csv')
+spotify_com_id = pd.read_csv('./dados/StreamingHistory_music.csv')
 
-# Conectar ao banco de dados MongoDB
-client = pymongo.MongoClient("mongodb://localhost:27017/")  # Insira sua URI de conexão
-db = client["Spotify"]
-collection = db["StreamingHistory_music"]
 #_id, endTime, artistName, trackName, msPlayed
 
 st.title("Analisando dados do Spotify")
@@ -37,11 +33,11 @@ st.text(texto)
 
 
 st.subheader('1. Quanto tempo foi dedicado ao consumo de conteúdo no Spotify?')
+# Para excluir várias colunas
+#_id, endTime, artistName, trackName, msPlayed
+colunas_para_excluir = ['_id', 'artistName', 'trackName']
+df = spotify_com_id.drop(columns=colunas_para_excluir)
 
-# Recuperar os dados do banco de dados
-dados = collection.find({},{'_id':0,'endTime':1, 'msPlayed':1})  # Aqui você pode adicionar filtros, se necessário
-# Criar um DataFrame com os dados
-df = pd.DataFrame(dados)
 
 #convertendo a coluna endTime (string) para o tipo datetime
 df['endTime'] = pd.to_datetime(df['endTime'])
@@ -80,10 +76,12 @@ fig_tempo_dia.update_layout(title='Tempo de Streaming por dia',
 st.plotly_chart(fig_tempo_dia)
 
 st.subheader('2. Quais são as 10 músicas mais escutadas?')
-# Recuperar os dados do banco de dados
-dados = collection.find({},{'_id':0,'trackName':1, 'msPlayed':1})  # Aqui você pode adicionar filtros, se necessário
-# Criar um DataFrame com os dados
-df = pd.DataFrame(dados)
+
+
+# Para excluir várias colunas
+#_id, endTime, artistName, trackName, msPlayed
+colunas_para_excluir = ['_id', 'artistName', 'endTime']
+df = spotify_com_id.drop(columns=colunas_para_excluir)
 
 # Adicionar uma nova coluna 'hrPlayed' ao DataFrame com o tempo em horas para cada música
 df['hrPlayed'] = df['msPlayed'] / 3600000
@@ -121,8 +119,11 @@ df_musicas = df_agrupado
 
 st.subheader('3. Quais são os 5 artistas mais ouvidos?')
 
-dados = collection.find({},{'_id':0,'artistName':1, 'msPlayed':1})  # Aqui você pode adicionar filtros, se necessário
-df = pd.DataFrame(dados)
+# Para excluir várias colunas
+#_id, endTime, artistName, trackName, msPlayed
+colunas_para_excluir = ['_id', 'trackName', 'endTime']
+df = spotify_com_id.drop(columns=colunas_para_excluir)
+
 df['hrPlayed'] = df['msPlayed'] / 3600000
 
 df_agrupado = df.groupby('artistName')['hrPlayed'].sum().reset_index()
@@ -149,9 +150,15 @@ st.plotly_chart(fig_tempo_artista)
 df_artistas = df_agrupado
 st.subheader('4. Qual é o podcast mais ouvido?')
 
-collection = db["StreamingHistory_podcast"]
-dados = collection.find({},{'_id':0,'podcastName':1, 'msPlayed':1})  # Aqui você pode adicionar filtros, se necessário
-df = pd.DataFrame(dados)
+
+#lendo arquivo com os dados de historico de musicas
+spotify_com_id = pd.read_csv('./dados/StreamingHistory_podcast.csv')
+# Para excluir várias colunas
+colunas_para_excluir = ['_id', 'episodeName', 'endTime']
+df = spotify_com_id.drop(columns=colunas_para_excluir)
+
+
+
 df['hrPlayed'] = df['msPlayed'] / 3600000
 
 df_agrupado = df.groupby('podcastName')['hrPlayed'].sum().reset_index()
