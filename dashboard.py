@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 # Importando as bibliotecas:
 import pandas as pd
-#import json
-#import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
-from textwrap import wrap
 import streamlit as st
 import plotly.graph_objects as go
-import pymongo
 
 #lendo arquivo com os dados de historico de musicas
 spotify_com_id = pd.read_csv('./dados/StreamingHistory_music.csv')
